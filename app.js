@@ -5,8 +5,8 @@ const app = express()
 
 app.use("/api/user", user)
 
-app.listen(3000, () => {
-    console.log("Server listening on PORT: 3000")
+app.listen(5432, () => {
+    console.log("Server listening on PORT: 5432")
 })
 
 export default app
