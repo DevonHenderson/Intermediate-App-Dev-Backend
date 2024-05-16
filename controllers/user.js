@@ -3,6 +3,12 @@
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
+/**
+ * Creates a new user with the provided information.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns {Object} The response object with status and message
+ */
 const createUser = async (req, res) =>{
     try{
         //Check if the request content is JSON
