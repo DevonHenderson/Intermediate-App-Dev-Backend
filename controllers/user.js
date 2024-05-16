@@ -40,7 +40,12 @@ const createUser = async (req, res) =>{
     }
 }
 
-
+/**
+ * Gets a list of all users data
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns {Object} The response object with status and message
+ */
 const getAllUsers = async (req, res) => {
     try {
         const users = await prisma.user.findMany();
@@ -58,6 +63,12 @@ const getAllUsers = async (req, res) => {
     }
 };
 
+/**
+ * Get a single user data using ID value (int)
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns {Object} The response object with status and message
+ */
 const getUserByID = async (req, res) => {
     try{
         //See if request contains userID
