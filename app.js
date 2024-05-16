@@ -7,8 +7,10 @@ const app = express()
 app.use("/", homepage)
 app.use("/api/user", user)
 
-app.listen(5432, () => {
-    console.log("Server listening on PORT: 5432")
+const PORT = process.env.PORT
+app.listen(PORT, () => {
+    console.log(`\nServer listening on PORT: ${PORT}`)
+    console.log(`Localhost Link: http://localhost:${PORT}`)
 })
 
 export default app
