@@ -40,6 +40,25 @@ const createUser = async (req, res) =>{
     }
 }
 
+
+const getAllUsers = async (req, res) => {
+    try {
+        const users = await prisma.user.findMany();
+
+        //removes error showing "Cannot get /user"
+        if (users.length == 0){
+            return res.status(404).json({ msg: "No users found" })
+        }
+
+        //If users are found, show them
+        return res.status(200).json(users);
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
 export {
-    createUser
+    createUser,
+    getAllUsers
 }
