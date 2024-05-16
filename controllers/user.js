@@ -58,7 +58,36 @@ const getAllUsers = async (req, res) => {
     }
 };
 
+const getUserByID = async (req, res) => {
+    try{
+        //See if request contains userID
+        const userID = parseInt(req.params.id)
+        if (!userID){
+            return res.status(400).json({ error: "User ID in request is incorrect or missing" });
+        }
+
+        //Search for user using ID number
+        const user = await prisma.user.findUnique({
+            where: { id: userID}
+        })
+
+        //If user isnt found
+        if (!user){
+            return res.status(404).json({
+                msg: `No user with ID: ${userID}`
+            })
+        }
+
+        //User found, return the data
+        return res.status(200).json({ data: user })
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
 export {
     createUser,
-    getAllUsers
+    getAllUsers,
+    getUserByID
 }
