@@ -9,36 +9,46 @@ const prisma = new PrismaClient()
  * @param {Object} res - The response object.
  * @returns {Object} The response object with status and message
  */
-const createUser = async (req, res) =>{
-    try{
-        //Check if the request content is JSON
-        const contentType = req.headers["content-type"]
-        if (contentType != "application/json"){
-            //Show error with message if incorrect
-            return res.status(400).json({ 
+const createUser = async (req, res) => {
+    try {
+        const contentType = req.headers["content-type"];
+        if (contentType !== "application/json") {
+            return res.status(400).json({
                 error: "Invalid request format",
                 msg: "The request must be in JSON format (Content-Type: application/json)"
-            })
+            });
         }
 
-        //Create the user if the request was correct format
-        await prisma.user.create({
-            data: { ...req.body }
-        })
+        const { username } = req.body;
 
-        //Check that the user was created successfully
-        const user = await prisma.user.findMany()
+        // Check if user with same username already exists
+        let existingUser = await prisma.user.findUnique({
+            where: { username }
+        });
+
+        if (existingUser) {
+            // User already exists, return existing user's ID
+            return res.status(200).json({
+                msg: "User already exists",
+                id: existingUser.id
+            });
+        }
+
+        // Create the user if it doesn't already exist
+        const newUser = await prisma.user.create({
+            data: { ...req.body }
+        });
+
         return res.status(201).json({
             msg: "User created successfully",
-            data: user //List of all users returned to show user has been added
-        })
-
+            id: newUser.id
+        });
     } catch (err) {
         return res.status(500).json({
             msg: err.message,
-          });
+        });
     }
-}
+};
 
 /**
  * Gets a list of all users data
@@ -97,8 +107,44 @@ const getUserByID = async (req, res) => {
     }
 }
 
+const updateUserScore = async (req, res) => {
+    try {
+        const userID = parseInt(req.params.id);
+        const { unityBestScore } = req.body;
+
+        if (unityBestScore === undefined) {
+            return res.status(400).json({ error: "Score is required" });
+        }
+
+        const existingUser = await prisma.user.findUnique({
+            where: { id: userID }
+        });
+
+        if (!existingUser) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const currentScore = existingUser.unityBestScore || 0; // Default to 0 if no score exists
+        const newScore = parseInt(unityBestScore);
+
+        if (newScore > currentScore) {
+            const updatedUser = await prisma.user.update({
+                where: { id: userID },
+                data: { unityBestScore: newScore }
+            });
+
+            return res.status(200).json({ msg: "Score updated successfully", data: updatedUser });
+        } else {
+            return res.status(200).json({ msg: "Score not updated. New score is not higher." });
+        }
+    } catch (err) {
+        console.error("Error updating score:", err);
+        return res.status(500).json({ error: err.message });
+    }
+};
 export {
     createUser,
     getAllUsers,
-    getUserByID
+    getUserByID,
+    updateUserScore
 }
