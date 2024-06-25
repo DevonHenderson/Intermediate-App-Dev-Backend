@@ -137,7 +137,7 @@ const updateUserScore = async (req, res) => {
         }
 
         //Set score values to find highest score
-        const currentScore = existingUser.unityBestScore || 0; // Default to 0 if no score exists
+        const currentScore = existingUser.unityBestScore || Infinity; // Default to 0 if no score exists
         const newScore = parseInt(unityBestScore);
         //Compare the two scores and set highest score for user
         //Dont update if score lower than previous best
@@ -184,7 +184,7 @@ const updateUserBestTime = async (req, res) => {
         }
 
         //Set time values to find highest score
-        const currentBestTime = existingUser.unrealBestTime || 0; // Default to Infinity if no time exists
+        const currentBestTime = existingUser.unrealBestTime || Infinity; // Default to Infinity if no time exists
         const newBestTime = parseFloat(unrealBestTime);
 
         //Compare the two times and set lowest time for user
