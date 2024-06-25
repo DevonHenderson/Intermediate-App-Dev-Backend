@@ -142,9 +142,47 @@ const updateUserScore = async (req, res) => {
         return res.status(500).json({ error: err.message });
     }
 };
+
+const updateUserBestTime = async (req, res) => {
+    try {
+        const userID = parseInt(req.params.id);
+        const { unrealBestTime } = req.body;
+
+        if (unrealBestTime === undefined) {
+            return res.status(400).json({ error: "Best time is required" });
+        }
+
+        const existingUser = await prisma.user.findUnique({
+            where: { id: userID }
+        });
+
+        if (!existingUser) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const currentBestTime = existingUser.unrealBestTime || Infinity; // Default to Infinity if no time exists
+        const newBestTime = parseFloat(unrealBestTime);
+
+        if (newBestTime < currentBestTime) {
+            const updatedUser = await prisma.user.update({
+                where: { id: userID },
+                data: { unrealBestTime: newBestTime }
+            });
+
+            return res.status(200).json({ msg: "Best time updated successfully", data: updatedUser });
+        } else {
+            return res.status(200).json({ msg: "Best time not updated. New time is not better." });
+        }
+    } catch (err) {
+        console.error("Error updating best time:", err);
+        return res.status(500).json({ error: err.message });
+    }
+};
+
 export {
     createUser,
     getAllUsers,
     getUserByID,
-    updateUserScore
+    updateUserScore,
+    updateUserBestTime
 }
